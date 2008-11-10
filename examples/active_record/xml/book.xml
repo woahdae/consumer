@@ -1,0 +1,6 @@
+<BookResponse>
+  <book isbn="0974514055">
+    <title>Programming Ruby - 2nd Edition</title>
+    <description>Second edition of the great book out there</description>
+  </book>
+</BookResponse>

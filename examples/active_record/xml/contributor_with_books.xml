@@ -1,0 +1,19 @@
+<ContributorResponse>
+  <contributor role="author">
+    <name>David Thomas</name>
+    <books>
+      <book isbn="0974514055">
+        <title>Programming Ruby - 2nd Edition</title>
+        <description>Second edition of the great book out there</description>
+      </book>
+      <book isbn="1112223334">
+        <title>Hitchhikers Guide to the Galaxy</title>
+        <description>42</description>
+      </book>
+      <book isbn="4556677889">
+        <title>Cats</title>
+        <description>lol</description>
+      </book>
+    </books>
+  </contributor>
+</ContributorResponse>

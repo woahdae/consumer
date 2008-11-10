@@ -1,0 +1,1 @@
+This is an example focusing on maps in an active_record environment. Requests are irrelevant here, as they're not intended to ever be used with ActiveRecord (althogh nothing prevents it).

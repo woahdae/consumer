@@ -1,0 +1,14 @@
+<CrazyCarrierRateResponse>
+  <SomeJunk>
+  </SomeJunk>
+  <ShipService>
+    <Cost>5.00</Cost>
+    <Service>Ground</Service>
+    <Code>01</Code>
+  </ShipService>
+  <ShipService>
+    <Cost>1000.00</Cost>
+    <Service>Camel</Service>
+    <Code>02</Code>
+  </ShipService>
+</CrazyCarrierRateResponse>
