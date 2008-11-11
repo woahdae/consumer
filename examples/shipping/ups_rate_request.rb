@@ -1,17 +1,32 @@
 require File.dirname(__FILE__) + "/environment"
 
+# === Vendor API Docs
+# 
+# http://www.ups.com/gec/techdocs/pdf/dtk_RateXML_V1.zip
 class UPSRateRequest < XmlConsumer::Request
   response_class "Rate"
-  yaml_defaults  "shipping.yml", "ups"
-  required       :access_license_number
   error_paths({
     :root    => "//Error",
     :code    => "//ErrorCode",
     :message => "//ErrorDescription"
   })
-  defaluts({
+  yaml_defaults "shipping.yml", "ups"
+  required(
+    # these are in shipping.yml
+    :access_license_number,
+    :sender_zip,
+    :sender_country,
+    # these must be passed in
+    :zip,
+    :country,
+    # :city,
+    # :state,
+    :weight
+  )
+  defaults({
     :customer_type  => "wholesale",
     :pickup_type    => "daily_pickup",
+    :request_type   => "Rate", # or Shop
     :service_type   => "ground",
     :package_type   => "your_packaging",
     :weight_units   => 'LBS', # or KGS
@@ -19,8 +34,16 @@ class UPSRateRequest < XmlConsumer::Request
     :measure_length => 0,
     :measure_width  => 0,
     :measure_height => 0,
-    :currency_code  => "US"
+    # optional, but all or none
+    # :currency_code  => "US",
+    # :insured_value  => 0
   })
+  # optional
+  # * :city
+  # * :state
+  # * :sender_city
+  # * :sender_state
+  
   
   def url
     return "https://wwwcie.ups.com/ups.app/xml/Rate" if $TESTING
@@ -97,6 +120,7 @@ class UPSRateRequest < XmlConsumer::Request
           b.XpciVersion API_VERSION
         }
         b.RequestAction 'Rate'
+        b.RequestOption @request_type
       }
       b.CustomerClassification {
         b.Code CustomerTypes[@customer_type]
@@ -110,7 +134,7 @@ class UPSRateRequest < XmlConsumer::Request
             b.PostalCode @sender_zip
             b.CountryCode @sender_country
             b.City @sender_city 
-            b.StateProvinceCode sender_state
+            b.StateProvinceCode @sender_state
           }
         }
         b.ShipTo {
@@ -118,7 +142,7 @@ class UPSRateRequest < XmlConsumer::Request
             b.PostalCode @zip
             b.CountryCode @country
             b.City @city
-            b.StateProvinceCode state 
+            b.StateProvinceCode @state 
           }
         }
         b.Service {
@@ -126,7 +150,7 @@ class UPSRateRequest < XmlConsumer::Request
         }
         b.Package {
           b.PackagingType {
-            b.Code PackageTypes[@packaging_type]
+            b.Code PackageTypes[@package_type]
             b.Description 'Package'
           }
           b.Description 'Rate Shopping'

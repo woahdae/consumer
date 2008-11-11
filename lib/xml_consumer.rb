@@ -17,3 +17,4 @@ end
 
 require 'xml_consumer/mapping'
 require 'xml_consumer/request'
+require 'xml_consumer/helper'

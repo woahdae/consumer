@@ -2,3 +2,7 @@ ups:
   access_license_number: 1A2B33G45CC98765
   user_id: upsuser
   password: upspass
+  sender_zip: "98115"
+  sender_country: US
+  sender_city: Seattle
+  sender_state: WA

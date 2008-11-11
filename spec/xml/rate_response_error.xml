@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<RatingServiceSelectionResponse>
+  <Response>
+    <TransactionReference>
+      <CustomerContext>
+        Rating and Service
+      </CustomerContext>
+      <XpciVersion>
+        1.0001
+      </XpciVersion>
+    </TransactionReference>
+    <ResponseStatusCode>
+      0
+    </ResponseStatusCode>
+    <ResponseStatusDescription>
+      Failure
+    </ResponseStatusDescription>
+    <Error>
+      <ErrorSeverity>
+        Hard
+      </ErrorSeverity>
+      <ErrorCode>
+        10002
+      </ErrorCode>
+      <ErrorDescription>
+        The XML document is well formed but the document is not valid
+      </ErrorDescription>
+      <ErrorLocation>
+        <ErrorLocationElementName>
+          RatingServiceSelectionRequest/Shipment/Package/PackagingType/Code
+        </ErrorLocationElementName>
+      </ErrorLocation>
+    </Error>
+  </Response>
+</RatingServiceSelectionResponse>
