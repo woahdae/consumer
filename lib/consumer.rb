@@ -11,10 +11,10 @@ class String
   include ActiveSupport::CoreExtensions::String::Inflections
 end
 
-module XmlConsumer
+module Consumer
   VERSION = '0.0.1'
 end
 
-require 'xml_consumer/mapping'
-require 'xml_consumer/request'
-require 'xml_consumer/helper'
+require 'consumer/mapping'
+require 'consumer/request'
+require 'consumer/helper'

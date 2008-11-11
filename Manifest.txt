@@ -4,12 +4,12 @@ PostInstall.txt
 README.rdoc
 Rakefile
 config/website.yml.sample
-lib/xml_consumer.rb
+lib/consumer.rb
 script/console
 script/destroy
 script/generate
 script/txt2html
-spec/xml_consumer_spec.rb
+spec/consumer_spec.rb
 spec/spec.opts
 spec/spec_helper.rb
 tasks/rspec.rake

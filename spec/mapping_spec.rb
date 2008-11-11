@@ -1,11 +1,11 @@
 require File.dirname(__FILE__) + "/spec_helper"
 
 class MockObject
-  include XmlConsumer::Mapping
+  include Consumer::Mapping
   attr_accessor :price, :integers
 end
 
-describe XmlConsumer::Mapping do
+describe Consumer::Mapping do
   before(:each) do
     # since maps are defined on the class and we want to test variations
     # on the same map, let's clear it before each spec

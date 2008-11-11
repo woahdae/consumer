@@ -1,5 +1,5 @@
 class Book < ActiveRecord::Base
-  include XmlConsumer::Mapping
+  include Consumer::Mapping
   has_and_belongs_to_many :contributors
 
   @habtm_registry = {

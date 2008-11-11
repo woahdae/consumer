@@ -1,11 +1,11 @@
 require File.dirname(__FILE__) + "/spec_helper"
 
-describe XmlConsumer::Helper do
+describe Consumer::Helper do
   describe "tidy" do
     it "formats a newline-less glob of xml into something pretty" do
       dirty = "<hello><woot>hoo yeah nelly</woot><empty></empty></hello>"
       clean = "<hello>\n  <woot>\n    hoo yeah nelly\n  </woot>\n  <empty/>\n</hello>\n"
-      XmlConsumer::Helper.tidy(dirty).should == clean
+      Consumer::Helper.tidy(dirty).should == clean
     end
   end
   
@@ -26,7 +26,7 @@ describe XmlConsumer::Helper do
     end
     
     after(:each) do
-      XmlConsumer::Helper.compact_xml(@dirty).should == @clean
+      Consumer::Helper.compact_xml(@dirty).should == @clean
     end
   end
   
@@ -51,7 +51,7 @@ describe XmlConsumer::Helper do
       file = "some/file.yaml"
       File.should_receive(:exists?).and_return(true)
       File.should_receive(:read).with("some/file.yaml").and_return(@yaml)
-      XmlConsumer::Helper.hash_from_yaml(file, @namespace).should == {"hello" => "world"}
+      Consumer::Helper.hash_from_yaml(file, @namespace).should == {"hello" => "world"}
     end
   end
 end

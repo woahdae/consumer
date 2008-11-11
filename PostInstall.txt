@@ -1,5 +1,5 @@
 
-For more information on xml_consumer, see http://xml_consumer.rubyforge.org
+For more information on consumer, see http://consumer.rubyforge.org
 
 NOTE: Change this information in PostInstall.txt 
 You can also delete it if you don't want it.

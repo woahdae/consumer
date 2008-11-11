@@ -1,4 +1,4 @@
-= xml_consumer
+= consumer
 
 * FIX (url)
 

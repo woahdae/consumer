@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + "/spec_helper"
 
-class MockRequest < XmlConsumer::Request
+class MockRequest < Consumer::Request
   required :hello
   url      "http://www.example.com/api"
   
@@ -13,16 +13,16 @@ class MockRequest < XmlConsumer::Request
 end
 
 class Mock
-  include XmlConsumer::Mapping
+  include Consumer::Mapping
   attr_accessor :hello
   map(:first, "//SillyXml", {:hello => "Hello"})
 end
 
-describe XmlConsumer::Request do
+describe Consumer::Request do
   describe "initialize" do
     it "should load defaults, with passed-in values taking priority" do
       request = MockRequest.allocate # creates an object w/o calling initialize
-      XmlConsumer::Helper.should_receive(:hash_from_yaml).
+      Consumer::Helper.should_receive(:hash_from_yaml).
         and_return({:hello => "default value", :another => "value"})
       request.should_receive(:initialize_attrs).
         with({:hello => "passed in value", :another => "value"})
@@ -68,7 +68,7 @@ describe XmlConsumer::Request do
       resp_xml = File.read("spec/xml/rate_response_error.xml")
       
       lambda {request.send(:check_request_error, resp_xml) }.
-        should raise_error(XmlConsumer::Request::RequestError)
+        should raise_error(Consumer::Request::RequestError)
     end
   end
   

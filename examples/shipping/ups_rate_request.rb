@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + "/environment"
 # === Vendor API Docs
 # 
 # http://www.ups.com/gec/techdocs/pdf/dtk_RateXML_V1.zip
-class UPSRateRequest < XmlConsumer::Request
+class UPSRateRequest < Consumer::Request
   response_class "Rate"
   error_paths({
     :root    => "//Error",

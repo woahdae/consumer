@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + "/environment"
 
 class Rate
-  include XmlConsumer::Mapping
+  include Consumer::Mapping
   attr_accessor :service, :code, :price, :carrier
   
   # UPS

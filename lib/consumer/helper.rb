@@ -1,4 +1,4 @@
-module XmlConsumer::Helper
+module Consumer::Helper
   # if you pass in a newline-less glob of xml it'll return an indented copy
   # for improved readability (just returns the xml as is otherwise)
   def self.tidy(xml)

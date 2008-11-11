@@ -1,4 +1,4 @@
-h1. xml_consumer
+h1. consumer
 
 
 h2. What
@@ -6,7 +6,7 @@ h2. What
 
 h2. Installing
 
-<pre syntax="ruby">sudo gem install xml_consumer</pre>
+<pre syntax="ruby">sudo gem install consumer</pre>
 
 h2. The basics
 
@@ -17,9 +17,9 @@ h2. Demonstration of usage
 
 h2. Forum
 
-"http://groups.google.com/group/xml_consumer":http://groups.google.com/group/xml_consumer
+"http://groups.google.com/group/consumer":http://groups.google.com/group/consumer
 
-TODO - create Google Group - xml_consumer
+TODO - create Google Group - consumer
 
 h2. How to submit patches
 
@@ -27,7 +27,7 @@ Read the "8 steps for fixing other people's code":http://drnicwilliams.com/2007/
 
 TODO - pick SVN or Git instructions
 
-The trunk repository is <code>svn://rubyforge.org/var/svn/xml_consumer/trunk</code> for anonymous access.
+The trunk repository is <code>svn://rubyforge.org/var/svn/consumer/trunk</code> for anonymous access.
 
 OOOORRRR
 
@@ -37,7 +37,7 @@ You can fetch the source from either:
 
 * rubyforge: "http://rubyforge.org/scm/?group_id=<%= rubyforge_project_id %>":http://rubyforge.org/scm/?group_id=<%= rubyforge_project_id %>
 
-<pre>git clone git://rubyforge.org/xml_consumer.git</pre>
+<pre>git clone git://rubyforge.org/consumer.git</pre>
 
 <% else %>
 
@@ -52,21 +52,21 @@ Or you can hack website/index.txt and make it all go away!!
 
 <% end %>
 
-* github: "http://github.com/GITHUB_USERNAME/xml_consumer/tree/master":http://github.com/GITHUB_USERNAME/xml_consumer/tree/master
+* github: "http://github.com/GITHUB_USERNAME/consumer/tree/master":http://github.com/GITHUB_USERNAME/consumer/tree/master
 
-<pre>git clone git://github.com/GITHUB_USERNAME/xml_consumer.git</pre>
+<pre>git clone git://github.com/GITHUB_USERNAME/consumer.git</pre>
 
 
 TODO - add "github_username: username" to ~/.rubyforge/user-config.yml and newgem will reuse it for future projects.
 
 
-* gitorious: "git://gitorious.org/xml_consumer/mainline.git":git://gitorious.org/xml_consumer/mainline.git
+* gitorious: "git://gitorious.org/consumer/mainline.git":git://gitorious.org/consumer/mainline.git
 
-<pre>git clone git://gitorious.org/xml_consumer/mainline.git</pre>
+<pre>git clone git://gitorious.org/consumer/mainline.git</pre>
 
 h3. Build and test instructions
 
-<pre>cd xml_consumer
+<pre>cd consumer
 rake test
 rake install_gem</pre>
 
@@ -77,5 +77,5 @@ This code is free to use under the terms of the MIT license.
 
 h2. Contact
 
-Comments are welcome. Send an email to "":mailto: via the "forum":http://groups.google.com/group/xml_consumer
+Comments are welcome. Send an email to "":mailto: via the "forum":http://groups.google.com/group/consumer
 

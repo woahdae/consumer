@@ -3,7 +3,7 @@ require 'active_record'
 require 'sqlite3'
 
 
-require File.dirname(__FILE__) + '/../../lib/xml_consumer.rb'
+require File.dirname(__FILE__) + '/../../lib/consumer.rb'
 
 $:.unshift(File.dirname(__FILE__))
 require 'models/contributor'
