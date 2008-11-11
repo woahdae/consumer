@@ -3,22 +3,114 @@ require 'net/https'
 require 'yaml'
 
 ##
-# === Attributes
-# [+required+] Array of symbols for required attributes; if one is omitted,
-#              +send+ will raise a RequiredFieldError
+# === Class Attrubutes
+# [+required+]       Defines attributes that must be present in any instance
+#                    before calling +do+. Anything defined here but not set in 
+#                    the instance will raise a RequiredFieldError on calling +do+
+#                    
+#                    Defaluts to []
+# [+response_class+] String for setting the class the request will use to parse
+#                    the response.
+# 
+#                    Defaults to [Something]Request, ex. for a
+#                    RateRequest, this would default to "Rate".
+# 
+#                    Note that the instance method with the same name returns a
+#                    constant rather than the string set here.
+# [+yaml_defaults+]  Consists of two parameters. In order:
+#                    * The location (as a string) for a yaml file containing 
+#                      attribute defaults.
+#                    * A namespace to grab the defaults out of.
+#                      
+#                      If your yaml looked like this:
+#                      
+#                      <pre>
+#                      ups:
+#                        user_id: Woody
+#                      usps:
+#                        user_id: John
+#                      </pre>
+#                      
+#                      UPSRequest would want to use "ups" as the namespace value,
+#                      where USPSRequest would want to use "usps"
+#                      
+#                      This is optional and has no default
+# [+error_paths+]    If you define this in your subclasses to return a hash for
+#                    error options (see "Options" below) they will raise 
+#                    informative RequestError errors with xml error info in the
+#                    message.
+#                    
+#                    If this is left undefined and the remote server returns 
+#                    error xml rather than what you were expecting, you'll get
+#                    generic xml parsing errors instead of something informative.
+#                    
+#                    Note: currently only handles one error.
+#                    
+#                    === Options
+#                    
+#                    All options are xpaths. All options except +:root+ are relative
+#                    to the root (unless prefixed with "//")
+#                    * +:root+    - Root element of the error(s)
+#                    * +:code+    - Remote API's error code for this error
+#                    * +:message+ - Informative part of the error
+#                    
+#                    === Example
+#                    
+#                    <pre>
+#                    {
+#                      :root => "//Error",
+#                      :code => "ErrorCode",
+#                      :message => "LongDescription"
+#                    }
+#                    </pre>
+#                    
+#                    Anything passed in to initialize will override these, though.
 class XmlConsumer::Request
+  class << self
+    def url(url = nil)
+      @url = url if url
+      @url
+    end
+    
+    def required(*args)
+      @required = args if !args.empty?
+      @required || []
+    end
+    
+    def response_class(klass = nil)
+      @response_class = klass if klass
+      self.to_s =~ /(.+?)Request/
+      @response_class || $1
+    end
+    
+    def yaml_defaults(*args)
+      @yaml_defaults = args if !args.empty?
+      @yaml_defaults
+    end
+    
+    def defaults(defaults = nil)
+      @defaults = defaults if defaults
+      @defaults || {}
+    end
+
+    def error_paths(options = nil)
+      @error_paths = options if options
+      @options
+    end
+  end
+  
   class RequestError < StandardError;end
   class RequiredFieldError < StandardError;end
   
-  attr_accessor :required
   attr_reader :response_xml, :request_xml
   
-  # Loads defaults from +defaults_file+, merges them with passed in attrs
-  # (which overwrite defaults in +defaults_file+), and initializes all of
+  # First gets defaults from self.defaults, merges them with defaults from 
+  # +yaml_defaults+, merges all that with passed in attrs, and initializes all
   # those into instance variables for use in to_xml.
   def initialize(attrs = {})
-    defaults = hash_from_yaml(defaults_file)
-    initialize_attrs(defaults.merge(attrs))
+    defaults = self.defults
+    yaml_defaults = hash_from_yaml(*yaml_defaults)
+    initialize_attrs(defaults.merge(yaml_defaults).merge(attrs))
     @required = self.class.instance_variable_get("@required")
   end
   
@@ -28,7 +120,7 @@ class XmlConsumer::Request
   # * All attributes in self.required must exist; raises RequiredFieldError 
   #   otherwise
   # * self.to_xml must be defined; RuntimeError otherwise
-  # * self.url must be defined; RuntimeError otherwise
+  # * self.url must be set; RuntimeError otherwise
   # * response_class.from_xml must be defined; RuntimeError otherwise
   # === Returns
   # Whatever response_class.from_xml(@response_xml) returns, which should be
@@ -37,10 +129,11 @@ class XmlConsumer::Request
   def do
     check_required
     raise "to_xml not defined for #{self.class}" if not defined?(self.to_xml)
-    raise "url not defined for #{self.class}" if not defined?(self.url)
+    raise "url not defined for #{self.class}" if not self.url
     raise "from_xml not defined for #{response_class}" if not defined?(response_class.from_xml)
     
-    @request_xml = self.to_xml
+    xml = self.to_xml
+    @request_xml = (defined?(COMPACT_XML) && !COMPACT_XML) ? xml : compact_xml(xml)
     uri = URI.parse self.url
     http = Net::HTTP.new uri.host, uri.port
     if uri.port == 443
@@ -58,69 +151,42 @@ class XmlConsumer::Request
   end
   
   # returns self.class.response_class as a constant (not a string)
-  # or the default [Something]Request, ex. for a RateRequest this would
-  # return the Rate constant.
+  # 
+  # Raises a runtime error when self.class.response_class is nil
   def response_class
-    self.class.to_s =~ /(.+?)Request/
-    ret = self.class.instance_variable_get("@response_class") || $1
+    ret = self.class.response_class
+    raise "Invalid response_class; see docs for naming conventions etc" if !ret
     return Object.const_get(ret)
   end
   
-  # Used for setting the class the request will use to parse the response.
-  # Note that the +class_string+ parameter should be a string, like "Rate",
-  # and not a constant (this will avoid load order issues)
-  def self.response_class(class_string)
-    @response_class = class_string
-  end
-  
-  # Use this to define attributes that must be present in the Request instance
-  # before calling +do+. Anything defined here but not in the instance will
-  # raise a RequiredFieldError on calling +do+
-  def self.required(*args)
-    @required = args
-  end
-  
-  # If you define this in your subclasses to return a hash for error options
-  # (see "Options" below) they will raise informative
-  # RequestError errors with xml error info in the message. 
-  # 
-  # If this is left undefined and the remote server returns error xml rather
-  # than what you were expecting, you'll get generic xml parsing errors
-  # instead of something informative.
-  # 
-  # Note: currently only handles one error.
-  # === Options
-  # All options are xpaths. All options except +:root+ are relative
-  # to the root (unless prefixed with "//")
-  # [+:root+]    Root element of the error(s)
-  # [+:code+]    Remote API's error code for this error
-  # [+:message+] Informative part of the error
-  # === Example
-  # <pre>
-  # {
-  #   :root => "//Error",
-  #   :code => "ErrorCode",
-  #   :message => "LongDescription"
-  # }
-  # </pre>
   def error_paths
-    nil
+    self.class.error_paths
   end
   
-  # If you define this in your subclass to return a string for the location
-  # of a yaml file it'll load 'em as instance variables on initialize.
-  # Anything passed in to initialize will override these, though.
-  def defaults_file
-    nil
+  def required
+    self.class.required
+  end
+  
+  def yaml_defaults
+    self.class.yaml_defaults
+  end
+  
+  def url
+    self.class.url
+  end
+  
+  def defaults
+    self.class.defaults
   end
   
 private
   
   # returns a hash of defaults if +self.defaults_yaml+ is defined and the file
   # defined there exists, empty hash otherwise.
-  def hash_from_yaml(file)
+  def hash_from_yaml(file, namespace = nil)
     defaults_exist = file && File.exists?(file)
-    return defaults_exist ? YAML.load(File.open(file)) : {}
+    hash = defaults_exist ? YAML.load(File.read(file)) : {}
+    return namespace ? hash[namespace] : hash
   end
   
   # If the response xml contains an error notification, this'll raise a
@@ -174,16 +240,16 @@ private
     
     # replace empty tag pairs with <tag/>
     xml.gsub!(/\<(\w*?)\>\<\/\1\>/, "<\\1/>")
-    # add in newlines after >, and sometimse before < #
+    # add in newlines after >, and sometimse before <
     xml.gsub!(/\>/,">\n").gsub!(/([^\<\>\n])\</,"\\1\n<")
     
-    # add appropriate spacing before each newline #
+    ### add appropriate spacing before each newline ###
     tab = -1
     last_indent = nil
     return xml.collect do |line|
       next line if line =~ /\<\?xml/ # skip indenting this
       
-      ## calculate the indentation ##
+      # calculate the indentation #
       if line =~ /\<\//
         # it's an end tag
         indent = -1
@@ -209,12 +275,26 @@ private
       end
       tab += indent
       
-      ## save indent for next time to deal with the siblings case (see above) ##
+      # save indent for next time to deal with the siblings case (see above) #
       last_indent = indent
       
-      ## return line with appropriate amount of preceding spaces ##
+      # return line with appropriate amount of preceding spaces #
       line = "  " * tab.abs + line
     end.join
   end
-
+  
+  # returns a copy of the xml without empty nodes. Also removes internal 
+  # (non-leaf) nodes that only contain empty leaves. Nodes containing only
+  # whitespace characters (space, newline, tab, and return) are considered empty.
+  def compact_xml(xml)
+    old_xml = xml
+    loop do
+      new_xml = old_xml.gsub(/\<(\w*?)\>[ \t\r\n]*\<\/\1\>\n?/, "")
+      if old_xml == new_xml # nothing was changed
+        return new_xml
+      else # something changed, so we'll go through it again
+        old_xml = new_xml
+      end
+    end
+  end
 end

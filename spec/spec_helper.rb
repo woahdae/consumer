@@ -6,5 +6,7 @@ rescue LoadError
   require 'spec'
 end
 
+$TESTING = true
+
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'xml_consumer'

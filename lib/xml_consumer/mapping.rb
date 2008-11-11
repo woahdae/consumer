@@ -1,3 +1,4 @@
+require 'ruby-debug'
 module XmlConsumer::Mapping
   def self.included(base)
     base.extend ClassMethods
@@ -46,7 +47,10 @@ module XmlConsumer::Mapping
   # Nothing in particular
   def association_from_xml(xml, association, klass = nil)
     klass ||= association.to_s.capitalize.singularize.constantize 
+
     association_instance = klass.from_xml(xml)
+    return if association_instance.nil?
+    
     self.send(association.to_s + "=", association_instance)
   end
   
@@ -61,7 +65,7 @@ module XmlConsumer::Mapping
       end
       
       map = {
-        :first_or_all => first_or_all,
+        :all => first_or_all == :all ? true : false,
         :base_path => base_path,
         :registry => registry,
         :associations => [*options[:include]].compact,
@@ -74,6 +78,7 @@ module XmlConsumer::Mapping
     
     def from_xml_via_map(xml)
       nodes, map = find_nodes_and_map(xml)
+      return nil if map.nil?
       instances = []
 
       nodes.each do |node|
@@ -89,12 +94,7 @@ module XmlConsumer::Mapping
         instances << instance
       end
       
-      case map[:first_or_all]
-      when :first
-        return instances.first
-      when :all
-        return instances
-      end
+      return map[:all] ? instances : instances.first
     end
     
     # you should be able to override this to what you want
