@@ -1,0 +1,20 @@
+Description:
+
+  Creates request and response classes. 
+  
+  The first argument is the name of the request class *without* the word
+  "Request" at the end. This is added automatically. i.e. "UPSRate" would
+  generate the UPSRateRequest class.
+  
+  The second (optional) argument is for the response class, and no name
+  trickery here - you get what you say. It defaults to the first argument,
+  so if that was "UPSRate", a UPSRate class would be created as the
+  response object (and UPSRateRequest would return UPSRate object(s)).
+  
+Usage:
+
+  script/generate request ShortRequestClass [ResponseClass=ShortRequestClass]
+  
+  ex. script/generate request UPSRate Rate
+  => generates UPSRateRequest, which returns Rate objects, and generates
+     the Rate class.
