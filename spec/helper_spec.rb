@@ -2,10 +2,51 @@ require File.dirname(__FILE__) + "/spec_helper"
 
 describe Consumer::Helper do
   describe "tidy" do
-    it "formats a newline-less glob of xml into something pretty" do
-      dirty = "<hello><woot>hoo yeah nelly</woot><empty></empty></hello>"
-      clean = "<hello>\n  <woot>\n    hoo yeah nelly\n  </woot>\n  <empty/>\n</hello>\n"
-      Consumer::Helper.tidy(dirty).should == clean
+    it "formats a basic newline-less glob of xml into something pretty" do
+      @dirty = "<hello><woot>hoo yeah nelly</woot></hello>"
+      @clean = <<-EOF
+<hello>
+  <woot>hoo yeah nelly</woot>
+</hello>
+EOF
+    end
+    
+    it "reformats nil nodes into <element/>" do
+      @dirty = "<hello><nil></nil><notnil>text</notnil></hello>"
+      @clean = <<-EOF
+<hello>
+  <nil/>
+  <notnil>text</notnil>
+</hello>
+EOF
+    end
+    
+    it "reformats more complex globs" do
+      @dirty = "<?xml version=\"1.0\"?><RatingServiceSelectionResponse><Response><TransactionReference><CustomerContext>RatingandService</CustomerContext><XpciVersion>1.0001</XpciVersion></TransactionReference><ResponseStatusCode>1</ResponseStatusCode><ResponseStatusDescription>Success</ResponseStatusDescription></Response><RatedShipment><Service><Code>03</Code></Service></RatedShipment></RatingServiceSelectionResponse>"
+      @clean = <<-EOF
+<?xml version="1.0"?>
+<RatingServiceSelectionResponse>
+  <Response>
+    <TransactionReference>
+      <CustomerContext>RatingandService</CustomerContext>
+      <XpciVersion>1.0001</XpciVersion>
+    </TransactionReference>
+    <ResponseStatusCode>1</ResponseStatusCode>
+    <ResponseStatusDescription>Success</ResponseStatusDescription>
+  </Response>
+  <RatedShipment>
+    <Service>
+      <Code>03</Code>
+    </Service>
+  </RatedShipment>
+</RatingServiceSelectionResponse>
+EOF
+    end
+    
+    after(:each) do
+      res = Consumer::Helper.tidy(@dirty) 
+      puts res if res != @clean
+      res.should == @clean
     end
   end
   

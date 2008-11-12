@@ -9,46 +9,37 @@ module Consumer::Helper
     # replace empty tag pairs with <tag/>
     xml.gsub!(/\<(\w*?)\>\<\/\1\>/, "<\\1/>")
     # add in newlines after >, and sometimse before <
-    xml.gsub!(/\>/,">\n").gsub!(/([^\<\>\n])\</,"\\1\n<")
+    xml.gsub!(/\>\</,">\n<")
     
-    ### add appropriate spacing before each newline ###
-    tab = -1
-    last_indent = nil
+    declaration = /\<\?xml/
+    start_tag   = /\<[^\/]+?\>[\n\t\r ]+/
+    end_tag     = /^[\t ]*\<\//
+    
+    ## add appropriate spacing before each newline.
+    tab = 0
+    siblings = false
+    first_tag = true
     return xml.collect do |line|
-      next line if line =~ /\<\?xml/ # skip indenting this
+      next line if line =~ declaration
       
-      # calculate the indentation #
-      if line =~ /\<\//
-        # it's an end tag
-        indent = -1
-      elsif line =~ /\<.+?\/>/
-        # it's an empty node, which is equivalent to
-        # parsing a start tag and an end tag. Thus, we should
-        # act like tab has been indented (tab += 1), and set
-        # the indent to -1 (see sibling comment below)
-        tab += 1
-        indent = -1
-      elsif line =~ /\</
-        # it's a start tag
-        if last_indent == -1
-          # back-to-back close/start tags are siblings; no indent here
-          indent = 0
-        else
-          # it's a child of another tag
-          indent = 1
-        end
-      else 
-        # it's a text node
-        indent = 1
+      # calculate the indentation.
+      # In general we want to add spacing if it's a start tag or leaf node, and
+      # remove spacing if it's an end tag. The only times we don't want to add
+      # spacing is if it's the very first node or the previous node was a sibling
+      # instead of a parent.
+      if line =~ end_tag
+        tab -= 1
+      else
+        tab += 1 unless first_tag || siblings
       end
-      tab += indent
-      
-      # save indent for next time to deal with the siblings case (see above) #
-      last_indent = indent
+
+      # if the line is a start tag, the next lines will no longer be siblings
+      siblings = line =~ start_tag ? false : true
+      first_tag = false
       
       # return line with appropriate amount of preceding spaces #
-      line = "  " * tab.abs + line
-    end.join
+      line = "  " * (tab > 0 ? tab : 0) + line
+    end.join << "\n"
   end
   
   # returns a copy of the xml without empty nodes. Also removes internal 
