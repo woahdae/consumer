@@ -60,9 +60,8 @@ module Consumer::Helper
   # returns a hash of defaults if +self.defaults_yaml+ is defined and the file
   # defined there exists, empty hash otherwise.
   def self.hash_from_yaml(file, namespace = nil)
-    defaults_exist = file && File.exists?(file)
-    hash = defaults_exist ? YAML.load(File.read(file)) : {}
-    return namespace ? hash[namespace] : hash
+    hash = file ? YAML.load(File.read(file)) : {}
+    return namespace && hash[namespace] ? hash[namespace] : hash
   end
   
 end

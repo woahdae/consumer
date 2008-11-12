@@ -1,7 +1,7 @@
 require 'net/http'
 require 'net/https'
 require 'yaml'
-
+require 'ruby-debug'
 ##
 # === Class Attrubutes
 # [+required+]       Defines attributes that must be present in any instance
@@ -66,161 +66,161 @@ require 'yaml'
 #
 #                    Anything passed in to initialize will override these, though.
 class Consumer::Request
- include Consumer
-
- class << self
-   def url(url = nil)
-     @url = url if url
-     @url
-   end
-
-   def required(*args)
-     @required = args if !args.empty?
-     @required || []
-   end
-
-   def response_class(klass = nil)
-     @response_class = klass if klass
-     self.to_s =~ /(.+?)Request/
-     @response_class || $1
-   end
-
-   def yaml_defaults(*args)
-     @yaml_defaults = args if !args.empty?
-     @yaml_defaults
-   end
-
-   def defaults(defaults = nil)
-     @defaults = defaults if defaults
-     @defaults || {}
-   end
-
-   def error_paths(options = nil)
-     @error_paths = options if options
-     @error_paths
-   end
- end
-
- class RequestError < StandardError;end
- class RequiredFieldError < StandardError;end
-
- attr_reader :response_xml, :request_xml
-
- # First gets defaults from self.defaults, merges them with defaults from
- # +yaml_defaults+, merges all that with passed in attrs, and initializes all
- # those into instance variables for use in to_xml.
- def initialize(attrs = {})
-   defaults = self.defaults
-   yaml = Helper.hash_from_yaml(*yaml_defaults)
-   initialize_attrs(defaults.merge(yaml).merge(attrs))
-   @required = self.class.instance_variable_get("@required")
- end
-
- # Sends self.to_xml to self.url and returns new object(s) created via
- # [response_class].from_xml
- # === Prerequisites
- # * All attributes in self.required must exist; raises RequiredFieldError
- #   otherwise
- # * self.to_xml must be defined; RuntimeError otherwise
- # * self.url must be set; RuntimeError otherwise
- # * response_class.from_xml must be defined; RuntimeError otherwise
- # === Returns
- # Whatever response_class.from_xml(@response_xml) returns, which should be
- # an object or array of objects (an array of objects if response_class is
- # using Consumer::Mapping)
- def do
-   check_required
-   raise "to_xml not defined for #{self.class}" if not defined?(self.to_xml)
-   raise "url not defined for #{self.class}" if not self.url
-   raise "from_xml not defined for #{response_class}" if not defined?(response_class.from_xml)
-
-   xml = self.to_xml
-   @request_xml = (defined?(COMPACT_XML) && !COMPACT_XML) ? xml : Helper.compact_xml(xml)
-   uri = URI.parse self.url
-   http = Net::HTTP.new uri.host, uri.port
-   if uri.port == 443
-     http.use_ssl = true
-     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-   end
-
-   puts "\n##### Request to #{url}:\n\n#{@request_xml}\n" if $DEBUG
-   @response_xml = http.post(uri.path, @request_xml).body
-   puts "\n##### Response:\n\n#{Helper.tidy(@response_xml)}\n" if $DEBUG
-
-   check_request_error(@response_xml)
-
-   return response_class.from_xml(@response_xml)
- end
-
- # returns self.class.response_class as a constant (not a string)
- #
- # Raises a runtime error when self.class.response_class is nil
- def response_class
-   ret = self.class.response_class
-   raise "Invalid response_class; see docs for naming conventions etc" if !ret
-   return Object.const_get(ret)
- end
-
- def error_paths
-   self.class.error_paths
- end
-
- def required
-   self.class.required
- end
-
- def yaml_defaults
-   self.class.yaml_defaults
- end
-
- def url
-   self.class.url
- end
-
- def defaults
-   self.class.defaults
- end
-
+  include Consumer
+ 
+  class << self
+    def url(url = nil)
+      @url = url if url
+      @url
+    end
+ 
+    def required(*args)
+      @required = args if !args.empty?
+      @required || []
+    end
+ 
+    def response_class(klass = nil)
+      @response_class = klass if klass
+      self.to_s =~ /(.+?)Request/
+      @response_class || $1
+    end
+ 
+    def yaml_defaults(*args)
+      @yaml_defaults = args if !args.empty?
+      @yaml_defaults
+    end
+ 
+    def defaults(defaults = nil)
+      @defaults = defaults if defaults
+      @defaults || {}
+    end
+ 
+    def error_paths(options = nil)
+      @error_paths = options if options
+      @error_paths
+    end
+  end
+ 
+  class RequestError < StandardError;end
+  class RequiredFieldError < StandardError;end
+ 
+  attr_reader :response_xml, :request_xml
+ 
+  # First gets defaults from self.defaults, merges them with defaults from
+  # +yaml_defaults+, merges all that with passed in attrs, and initializes all
+  # those into instance variables for use in to_xml.
+  def initialize(attrs = {})
+    class_defaults = self.defaults
+    yaml = Helper.hash_from_yaml(*yaml_defaults)
+    all_defaults = class_defaults.merge(yaml)
+    initialize_attrs(all_defaults.merge(attrs))
+  end
+ 
+  # Sends self.to_xml to self.url and returns new object(s) created via
+  # [response_class].from_xml
+  # === Prerequisites
+  # * All attributes in self.required must exist; raises RequiredFieldError
+  #   otherwise
+  # * self.to_xml must be defined; RuntimeError otherwise
+  # * self.url must be set; RuntimeError otherwise
+  # * response_class.from_xml must be defined; RuntimeError otherwise
+  # === Returns
+  # Whatever response_class.from_xml(@response_xml) returns, which should be
+  # an object or array of objects (an array of objects if response_class is
+  # using Consumer::Mapping)
+  def do
+    check_required
+    raise "to_xml not defined for #{self.class}" if not defined?(self.to_xml)
+    raise "url not defined for #{self.class}" if not self.url
+    raise "from_xml not defined for #{response_class}" if not defined?(response_class.from_xml)
+ 
+    xml = self.to_xml
+    @request_xml = (defined?(COMPACT_XML) && !COMPACT_XML) ? xml : Helper.compact_xml(xml)
+    uri = URI.parse self.url
+    http = Net::HTTP.new uri.host, uri.port
+    if uri.port == 443
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    end
+ 
+    puts "\n##### Request to #{url}:\n\n#{@request_xml}\n" if $DEBUG
+    @response_xml = http.post(uri.path, @request_xml).body
+    puts "\n##### Response:\n\n#{Helper.tidy(@response_xml)}\n" if $DEBUG
+ 
+    check_request_error(@response_xml)
+ 
+    return response_class.from_xml(@response_xml)
+  end
+ 
+  # returns self.class.response_class as a constant (not a string)
+  #
+  # Raises a runtime error when self.class.response_class is nil
+  def response_class
+    ret = self.class.response_class
+    raise "Invalid response_class; see docs for naming conventions etc" if !ret
+    return Object.const_get(ret)
+  end
+ 
+  def error_paths
+    self.class.error_paths
+  end
+ 
+  def required
+    self.class.required
+  end
+ 
+  def yaml_defaults
+    self.class.yaml_defaults
+  end
+ 
+  def url
+    self.class.url
+  end
+ 
+  def defaults
+    self.class.defaults
+  end
+ 
 private
-
- # If the xml contains an error notification, this'll raise a
- # RequestError with the xml error code and message as defined in
- # the options in error_paths. Returns nil otherwise.
- def check_request_error(xml)
-   return if !error_paths
-   return if !xml || !xml.include?('<?xml')
-
-   response_doc = LibXML::XML::Parser.string(xml).parse
-   error = response_doc.find_first(error_paths[:root])
-   return if error.nil? || error.empty?
-
-   code = error.find_first(error_paths[:code]).first.content
-   message = error.find_first(error_paths[:message]).first.content
-
-   raise RequestError, "Code #{code}: #{message}"
- end
-
- def builder # :nodoc:
-   @builder ||= Builder::XmlMarkup.new(:target => @xml, :indent => 2)
- end
- alias :b :builder
-
- # Will raise a RequiredFieldError if an attribute in self.required is nil
- def check_required
-   return if self.required.nil?
-
-   self.required.each do |attribute|
-     if eval("@#{attribute}").nil?
-       raise RequiredFieldError, "The #{attribute} variable needs to be set"
-     end
-   end
- end
-
- # set instance variables based on a hash, i.e. @key = value
- def initialize_attrs(attrs)
-   attrs.each do |attr, value|
-     self.instance_variable_set("@#{attr}", value)
-   end
- end
+ 
+  # If the xml contains an error notification, this'll raise a
+  # RequestError with the xml error code and message as defined in
+  # the options in error_paths. Returns nil otherwise.
+  def check_request_error(xml)
+    return if !error_paths
+    return if !xml || !xml.include?('<?xml')
+ 
+    response_doc = LibXML::XML::Parser.string(xml).parse
+    error = response_doc.find_first(error_paths[:root])
+    return if error.nil? || error.empty?
+ 
+    code = error.find_first(error_paths[:code]).first.content
+    message = error.find_first(error_paths[:message]).first.content
+ 
+    raise RequestError, "Code #{code}: #{message}"
+  end
+ 
+  def builder # :nodoc:
+    @builder ||= Builder::XmlMarkup.new(:target => @xml, :indent => 2)
+  end
+  alias :b :builder
+ 
+  # Will raise a RequiredFieldError if an attribute in self.required is nil
+  def check_required
+    return if self.required.nil?
+ 
+    self.required.each do |attribute|
+      if eval("@#{attribute}").nil?
+        raise RequiredFieldError, "#{attribute} needs to be set"
+      end
+    end
+  end
+ 
+  # set instance variables based on a hash, i.e. @key = value
+  def initialize_attrs(attrs)
+    attrs.each do |attr, value|
+      self.instance_variable_set("@#{attr}", value)
+    end
+  end
 
 end

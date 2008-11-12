@@ -90,7 +90,6 @@ EOF
     
     after(:each) do
       file = "some/file.yaml"
-      File.should_receive(:exists?).and_return(true)
       File.should_receive(:read).with("some/file.yaml").and_return(@yaml)
       Consumer::Helper.hash_from_yaml(file, @namespace).should == {"hello" => "world"}
     end
