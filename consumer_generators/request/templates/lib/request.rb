@@ -7,7 +7,7 @@ class <%= request_class %> < Consumer::Request
     :code    => "//ErrorCode",
     :message => "//ErrorDescription"
   })
-  yaml_defaults "config.yml", "<%= response_file %>"
+  yaml_defaults "config.yml", "<%= request_base.underscore %>"
   required(
     # :required_attrs_array
   )
@@ -24,7 +24,8 @@ class <%= request_class %> < Consumer::Request
   def to_xml
     b.instruct!
     
-    # see builder.rubyforge.org for how to use builder
+    # Consumer::Request comes with a ready to use Builder instance.
+    # docs at http://builder.rubyforge.org/classes/Builder/XmlMarkup.html
     # example:
     b.<%= request_class %> {
       b.Hello "World"

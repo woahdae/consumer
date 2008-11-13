@@ -4,17 +4,17 @@ class RequestGenerator < RubiGen::Base
   default_options :author => nil
 
   attr_reader :request_class, :response_class, :request_file, :response_file
-  attr_reader :response_xml, :appname
+  attr_reader :response_xml, :request_base, :appname
 
   def initialize(runtime_args, runtime_options = {})
     super
     usage if args.empty?
-    arg1 = args.shift
-    @request_class = arg1 + "Request"
-    @response_class = args.shift || arg1
+    @request_base = args.shift
+    @request_class = @request_base + "Request"
+    @response_class = args.shift || @request_base
     @request_file = @request_class.underscore
     @response_file = @response_class.underscore
-    @response_xml = arg1.underscore + "_response.xml"
+    @response_xml = @request_base.underscore + "_response.xml"
     @appname = APP_ROOT.split(/[\/\\]/).last
     extract_options
   end

@@ -1,7 +1,7 @@
 require 'net/http'
 require 'net/https'
 require 'yaml'
-require 'ruby-debug'
+
 ##
 # === Class Attrubutes
 # [+required+]       Defines attributes that must be present in any instance

@@ -1,11 +1,11 @@
 module Consumer::Helper
   # if you pass in a newline-less glob of xml it'll return an indented copy
-  # for improved readability (just returns the xml as is otherwise)
+  # for improved readability.
   def self.tidy(xml)
-    return xml if xml =~ /\n/ # if newlines are present, it might not need tidying
-    
     xml = xml.clone # avoid modifying @response_xml due to pass by reference
     
+    # remove all formatting to start from a common base
+    xml.gsub!(/\>[\t\n\r ]*\</, "><")
     # replace empty tag pairs with <tag/>
     xml.gsub!(/\<(\w*?)\>\<\/\1\>/, "<\\1/>")
     # add in newlines after >, and sometimse before <
@@ -57,11 +57,45 @@ module Consumer::Helper
     end
   end
 
-  # returns a hash of defaults if +self.defaults_yaml+ is defined and the file
+  # returns a hash of defaults if +self.yaml_defaults+ is defined and the file
   # defined there exists, empty hash otherwise.
+  # 
+  # Also takes a namespace, i.e. a sub-hash, and when given a namespace it also
+  # enables a global namespace called 'all'. Thus if you had the yaml:
+  # 
+  # <pre>
+  # all:
+  #   my_name: Buster
+  # greetings:
+  #   hello: world
+  # other:
+  #   irrelevant: data
+  # </pre>
+  # 
+  # a namespace of 'greetings' would return the hash:
+  # 
+  # <code>
+  # {"my_name" => "Buster", "hello" => "world"}
+  # </code>
+  # 
+  # You don't have to use the global namespace, but if you do, it will be included
+  # everywhere.
   def self.hash_from_yaml(file, namespace = nil)
-    hash = file ? YAML.load(File.read(file)) : {}
-    return namespace && hash[namespace] ? hash[namespace] : hash
+    begin
+      hash = file ? YAML.load(File.read(file)) : {}
+    rescue => e
+      raise ArgumentError, "YAML load error: #{e.message}"
+    end
+    
+    return {} if !hash
+    
+    if namespace
+      global = hash["all"] || {}
+      namespaced_hash = hash[namespace] || {}
+      hash = global.merge(namespaced_hash)
+    end
+    
+    return hash
   end
   
 end

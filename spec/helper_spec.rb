@@ -4,26 +4,26 @@ describe Consumer::Helper do
   describe "tidy" do
     it "formats a basic newline-less glob of xml into something pretty" do
       @dirty = "<hello><woot>hoo yeah nelly</woot></hello>"
-      @clean = <<-EOF
+      @clean = <<-EOS
 <hello>
   <woot>hoo yeah nelly</woot>
 </hello>
-EOF
+EOS
     end
     
     it "reformats nil nodes into <element/>" do
       @dirty = "<hello><nil></nil><notnil>text</notnil></hello>"
-      @clean = <<-EOF
+      @clean = <<-EOS
 <hello>
   <nil/>
   <notnil>text</notnil>
 </hello>
-EOF
+EOS
     end
     
     it "reformats more complex globs" do
       @dirty = "<?xml version=\"1.0\"?><RatingServiceSelectionResponse><Response><TransactionReference><CustomerContext>RatingandService</CustomerContext><XpciVersion>1.0001</XpciVersion></TransactionReference><ResponseStatusCode>1</ResponseStatusCode><ResponseStatusDescription>Success</ResponseStatusDescription></Response><RatedShipment><Service><Code>03</Code></Service></RatedShipment></RatingServiceSelectionResponse>"
-      @clean = <<-EOF
+      @clean = <<-EOS
 <?xml version="1.0"?>
 <RatingServiceSelectionResponse>
   <Response>
@@ -40,7 +40,25 @@ EOF
     </Service>
   </RatedShipment>
 </RatingServiceSelectionResponse>
-EOF
+EOS
+    end
+    
+    it "reformats xml with newlines" do
+      @dirty = <<-EOS
+<?xml version="1.0"?>
+<Error><Number>-2147219490</Number><Source>Rate_Respond;SOLServerRatesTest.RateV2_Respond</Source><Description>Invalid value for origin ZIP Code.</Description><HelpFile></HelpFile><HelpContext>1000440</HelpContext></Error>
+EOS
+      @clean = <<-EOS
+<?xml version="1.0"?>
+<Error>
+  <Number>-2147219490</Number>
+  <Source>Rate_Respond;SOLServerRatesTest.RateV2_Respond</Source>
+  <Description>Invalid value for origin ZIP Code.</Description>
+  <HelpFile/>
+  <HelpContext>1000440</HelpContext>
+</Error>
+
+EOS
     end
     
     after(:each) do
@@ -73,25 +91,46 @@ EOF
   
   describe "hash_from_yaml" do
     it "should load a yaml file and return a hash" do
-      @yaml = <<-EOF
+      @yaml = <<-EOS
       hello: world
-      EOF
+      EOS
+      perform
     end
     
     it "should return a subsection of the yaml if given a namespace" do
-      @yaml = <<-EOF
+      @yaml = <<-EOS
       greetings:
         hello: world
       other:
         not: relevant
-      EOF
+      EOS
       @namespace = "greetings"
+      perform
     end
     
-    after(:each) do
+    it "should return {} if no hash" do
+      @yaml = ""
+      @namespace = "greetings"
+      perform({})
+    end
+    
+    it "should have 'all' as a global namespace" do
+      @yaml = <<-EOS
+      all:
+        answer: 42
+      greetings:
+        hello: world
+      other:
+        not: relevant
+      EOS
+      @namespace = "greetings"
+      perform({"hello" => "world", "answer" => 42})
+    end
+
+    def perform(result = {"hello" => "world"})
       file = "some/file.yaml"
       File.should_receive(:read).with("some/file.yaml").and_return(@yaml)
-      Consumer::Helper.hash_from_yaml(file, @namespace).should == {"hello" => "world"}
+      Consumer::Helper.hash_from_yaml(file, @namespace).should == result
     end
   end
 end
