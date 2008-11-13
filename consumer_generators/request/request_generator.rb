@@ -4,7 +4,7 @@ class RequestGenerator < RubiGen::Base
   default_options :author => nil
 
   attr_reader :request_class, :response_class, :request_file, :response_file
-  attr_reader :response_spec_xml, :appname
+  attr_reader :response_xml, :appname
 
   def initialize(runtime_args, runtime_options = {})
     super
@@ -14,6 +14,7 @@ class RequestGenerator < RubiGen::Base
     @response_class = args.shift || arg1
     @request_file = @request_class.underscore
     @response_file = @response_class.underscore
+    @response_xml = arg1.underscore + "_response.xml"
     @appname = APP_ROOT.split(/[\/\\]/).last
     extract_options
   end
@@ -32,7 +33,7 @@ class RequestGenerator < RubiGen::Base
         ["lib/response.rb",       "lib/#{@appname}/#{@response_file}.rb"],
         ["spec/request_spec.rb",  "spec/#{@request_file}_spec.rb"],
         ["spec/response_spec.rb", "spec/#{@response_file}_spec.rb"],
-        ["spec/xml/response.xml", "spec/xml/#{@response_file}_response.xml"]
+        ["spec/xml/response.xml", "spec/xml/#{@response_xml}"]
       ]
       
       templates.each {|args| m.template *args}

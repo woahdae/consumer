@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + "/spec_helper"
 describe <%= request_class %> do
   
   it "should get rates with a canned response" do
-    file = "spec/xml/<%= response_file %>_response.xml"
+    file = "spec/xml/<%= response_xml %>"
     xml = File.read("#{file}")
     raise "need to put example response in #{file}" if xml.blank?
 
