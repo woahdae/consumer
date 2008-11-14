@@ -110,8 +110,15 @@ class Consumer::Request
   # +yaml_defaults+, merges all that with passed in attrs, and initializes all
   # those into instance variables for use in to_xml.
   def initialize(attrs = {})
-    class_defaults = self.defaults
+    # it's really handy to have all the other attrs init'd when we call
+    # self.defaults 'cuz we can use them to help define conditional defaults.
     yaml = Helper.hash_from_yaml(*yaml_defaults)
+    initialize_attrs(yaml.merge(attrs)) # load yaml, but attrs will overwrite dups
+    
+    # now self.defaults has access to above stuff
+    class_defaults = self.defaults
+    
+    # but we wanted defaults loaded first.
     all_defaults = class_defaults.merge(yaml)
     initialize_attrs(all_defaults.merge(attrs))
   end
@@ -129,12 +136,11 @@ class Consumer::Request
   # an object or array of objects (an array of objects if response_class is
   # using Consumer::Mapping)
   def do
-    check_required
     raise "to_xml not defined for #{self.class}" if not defined?(self.to_xml)
     raise "url not defined for #{self.class}" if not self.url
     raise "from_xml not defined for #{response_class}" if not defined?(response_class.from_xml)
  
-    xml = self.to_xml
+    xml = self.to_xml_with_required
     @request_xml = (defined?(COMPACT_XML) && !COMPACT_XML) ? xml : Helper.compact_xml(xml)
     uri = URI.parse self.url
     http = Net::HTTP.new uri.host, uri.port
@@ -150,6 +156,11 @@ class Consumer::Request
     check_request_error(@response_xml)
  
     return response_class.from_xml(@response_xml)
+  end
+  
+  def to_xml_with_required
+    check_required
+    return self.to_xml
   end
  
   # returns self.class.response_class as a constant (not a string)

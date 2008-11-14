@@ -25,7 +25,7 @@ describe Consumer::Request do
       Consumer::Helper.should_receive(:hash_from_yaml).
         and_return({:hello => "default value", :another => "value"})
       request.should_receive(:initialize_attrs).
-        with({:hello => "passed in value", :another => "value"})
+        with({:hello => "passed in value", :another => "value"}).twice
       request.send(:initialize, :hello => "passed in value")
     end
   end

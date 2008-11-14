@@ -17,4 +17,9 @@ Usage:
   
   ex. script/generate request UPSRate Rate
   => generates UPSRateRequest, which returns Rate objects, and generates
-     the Rate class.
+     the Rate class and specs.
+     
+  You should definitely look at the specs, and use DO_IT_LIVE (shown in specs) to
+  get started configuring the request. Once it gets back the kind of xml you want,
+  put it in the generated (empty) xml file and use that to configure the response
+  class with canned data. test one more time live, script/generate again, rinse, repeat.

@@ -1,3 +1,18 @@
+About Consumer:
 
-
+  Consumer creates an empty ready-for-rails gem primed for consuming xml resources
+  via Builder, libxml, and some request sending / response marshaling glue.
+  
+  Also comes with a generator for making the request/response classes, config files,
+  and specs (see script/generate after creating the gem).
+  
+Getting Started:
+  
+  execute:
+  
+  consumer your_gem_name
+  cd your_gem_name
+  script/generate request
+  
+  The last command should help you get rolling.
 

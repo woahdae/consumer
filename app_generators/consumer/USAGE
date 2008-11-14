@@ -1,5 +1,14 @@
 Description:
+
+  Creates an empty ready-for-rails gem primed for consuming an xml resource via
+  Builder, libxml, and some request sending / response marshaling glue.
   
+  Comes with a generator for making the request/response classes, config files,
+  and specs (see script/generate after creating the gem).
   
 Usage:
+  
+  consumer your_xml_consuming_gem_name
+  
+  (there are no options)
   

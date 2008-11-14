@@ -128,8 +128,8 @@ EOS
     end
 
     def perform(result = {"hello" => "world"})
-      file = "some/file.yaml"
-      File.should_receive(:read).with("some/file.yaml").and_return(@yaml)
+      file = "file.yml"
+      File.should_receive(:read).with("config/file.yml").and_return(@yaml)
       Consumer::Helper.hash_from_yaml(file, @namespace).should == result
     end
   end
