@@ -42,7 +42,7 @@ class RequestGenerator < RubiGen::Base
       # put in a relevant example if the config is still empty
       if File.exists?("config/#{@appname}.yml")
         config = YAML.load(File.read("config/#{@appname}.yml"))
-        File.open("config/#{@appname}.yml", "w") do |file|
+        File.open("config/#{@appname}.yml", "a") do |file|
           file << "all:\n  global_default: Value\n#{@request_base.underscore}:\n  request_default: Value"
         end if !config
       end

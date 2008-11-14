@@ -12,14 +12,18 @@ class <%= request_class %> < Consumer::Request
   })
   
   # Instance variables that must be set before xml sendoff
-  required(
-    # :required_attrs_array
-  )
+  def required
+    return [
+      # :required_attrs_array
+    ]
+  end
   
   # Lowest priority; overwritten by YAML, then params
-  defaults({
-    # :sensible_default => "Value"
-  })
+  def defaults
+    return {
+      # :sensible_default => "Value"
+    }
+  end
   
   def url
     return "www.example.com/testing" if $TESTING
