@@ -35,6 +35,7 @@ class TestConsumerGenerator < Test::Unit::TestCase
       script
       spec
       spec/xml
+      config
     )
     
     files = %w(
@@ -42,13 +43,13 @@ class TestConsumerGenerator < Test::Unit::TestCase
       LICENSE
       README.rdoc
       Rakefile
-      config.yml
-      config.yml.sample
       lib/myproject.rb
       rails/init.rb
       script/generate
       script/destroy
       spec/spec_helper.rb
+      config/myproject.yml
+      config/myproject.yml.sample
     )
     
     dirs.each { |dir| assert_directory_exists dir }

@@ -30,9 +30,10 @@ class ConsumerGenerator < RubiGen::Base
         LICENSE
         README.rdoc
         Rakefile
-        config.yml
-        config.yml.sample
       )
+      
+      m.file "config/config.yml", "config/#{@name}.yml"
+      m.template "config/config.yml.sample", "config/#{@name}.yml.sample"
       
       m.template_copy_each %w(
         TODO
@@ -83,5 +84,6 @@ EOS
       spec
       rails
       spec/xml
+      config
     )
 end

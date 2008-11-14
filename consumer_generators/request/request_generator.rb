@@ -1,4 +1,5 @@
 require 'active_support'
+require 'yaml'
 class RequestGenerator < RubiGen::Base
 
   default_options :author => nil
@@ -38,11 +39,12 @@ class RequestGenerator < RubiGen::Base
       
       templates.each {|args| m.template *args}
       
-      if File.exists?("config.yml")
-        config = File.read("config.yml")
-        File.open("config.yml", "w") do |file|
-          file << "#{@request_file}:\n  sensible_default: Value"
-        end if config.nil? || config.empty?
+      # put in a relevant example if the config is still empty
+      if File.exists?("config/#{@appname}.yml")
+        config = YAML.load(File.read("config/#{@appname}.yml"))
+        File.open("config/#{@appname}.yml", "w") do |file|
+          file << "all:\n  global_default: Value\n#{@request_base.underscore}:\n  request_default: Value"
+        end if !config
       end
       
       # Create stubs
