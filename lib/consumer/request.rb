@@ -140,8 +140,7 @@ class Consumer::Request
     raise "url not defined for #{self.class}" if not self.url
     raise "from_xml not defined for #{response_class}" if not defined?(response_class.from_xml)
  
-    xml = self.to_xml_with_required
-    @request_xml = (defined?(COMPACT_XML) && !COMPACT_XML) ? xml : Helper.compact_xml(xml)
+    @request_xml = self.to_xml_etc
     uri = URI.parse self.url
     http = Net::HTTP.new uri.host, uri.port
     if uri.port == 443
@@ -158,14 +157,26 @@ class Consumer::Request
     return response_class.from_xml(@response_xml)
   end
   
-  def to_xml_with_required
-    check_required
-    return self.to_xml
+  # Gets called during do instead of just to_xml, and does a bit more than
+  # just return xml.
+  # 
+  # First, it calls before_to_xml if it has been defined.
+  # Then it calls check_required, then returns the results of to_xml sans
+  # empty nodes (see Helper.compact_xml).
+  # 
+  # You can set a COMPACT_XML constant to false to avoid the latter behavior,
+  # but most APIs complain when you send them empty nodes (even if the nodes
+  # were optional to begin with).
+  def to_xml_etc
+    self.before_to_xml if defined?(before_to_xml)
+    self.check_required
+    xml = self.to_xml
+    return (defined?(COMPACT_XML) && !COMPACT_XML) ? xml : Helper.compact_xml(xml)
   end
  
   # returns self.class.response_class as a constant (not a string)
   #
-  # Raises a runtime error when self.class.response_class is nil
+  # Raises a runtime error if self.class.response_class is nil
   def response_class
     ret = self.class.response_class
     raise "Invalid response_class; see docs for naming conventions etc" if !ret
@@ -191,9 +202,22 @@ class Consumer::Request
   def defaults
     self.class.defaults
   end
+
+protected
+
+  # Will raise a RequiredFieldError if an attribute in self.required is nil
+  def check_required
+    return if self.required.nil?
  
+    self.required.each do |attribute|
+      if eval("@#{attribute}").nil?
+        raise RequiredFieldError, "#{attribute} needs to be set"
+      end
+    end
+  end
+
 private
- 
+
   # If the xml contains an error notification, this'll raise a
   # RequestError with the xml error code and message as defined in
   # the options in error_paths. Returns nil otherwise.
@@ -210,22 +234,12 @@ private
  
     raise RequestError, "Code #{code}: #{message}"
   end
- 
+  
   def builder # :nodoc:
     @builder ||= Builder::XmlMarkup.new(:target => @xml, :indent => 2)
   end
   alias :b :builder
  
-  # Will raise a RequiredFieldError if an attribute in self.required is nil
-  def check_required
-    return if self.required.nil?
- 
-    self.required.each do |attribute|
-      if eval("@#{attribute}").nil?
-        raise RequiredFieldError, "#{attribute} needs to be set"
-      end
-    end
-  end
  
   # set instance variables based on a hash, i.e. @key = value
   def initialize_attrs(attrs)

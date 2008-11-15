@@ -6,7 +6,7 @@ describe <%= request_class %> do
     <%= request_class.underscore %> = <%= request_class %>.new({
       # :attribute => value
     })
-    xml = <%= request_class.underscore %>.to_xml_with_required
+    xml = <%= request_class.underscore %>.to_xml_etc
     xml.should =~ /\<\?xml/
   end
   

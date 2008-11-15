@@ -1,6 +1,9 @@
 # === Vendor API Docs
 # http://www.example.com/handy_docs
 class <%= request_class %> < Consumer::Request
+  
+  ### Note: Everything except to_xml is optional (though handy) ###
+  
   response_class "<%= response_class %>"
   yaml_defaults "<%= appname %>.yml", "<%= request_base.underscore %>"
   
@@ -30,6 +33,9 @@ class <%= request_class %> < Consumer::Request
     
     "www.example.com"
   end
+  
+  # Called before required vars are checked, too
+  def before_to_xml; end
   
   # All this has to do is return xml, and we have a Builder instance to help.
   # Also, defaults, YAML, and the params are accessed via instance variables.

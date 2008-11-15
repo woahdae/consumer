@@ -28,7 +28,6 @@ class ConsumerGenerator < RubiGen::Base
       
       m.file_copy_each %w(
         LICENSE
-        README.rdoc
         Rakefile
       )
       
@@ -39,6 +38,7 @@ class ConsumerGenerator < RubiGen::Base
         TODO
         rails/init.rb
         spec/spec_helper.rb
+        README.rdoc
       )
       
       m.template "lib/base.rb", "lib/#{@name}.rb"
