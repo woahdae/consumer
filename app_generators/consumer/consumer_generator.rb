@@ -31,8 +31,8 @@ class ConsumerGenerator < RubiGen::Base
         Rakefile
       )
       
-      m.file "config/config.yml", "config/#{@name}.yml"
-      m.template "config/config.yml.sample", "config/#{@name}.yml.sample"
+      m.template "config/config.yml", "config/#{@name}.yml"
+      m.file "config/config.yml.sample", "config/#{@name}.yml.sample"
       
       m.template_copy_each %w(
         TODO

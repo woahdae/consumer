@@ -1,6 +1,7 @@
 require 'net/http'
 require 'net/https'
 require 'yaml'
+require 'ruby-debug'
 
 ##
 # === Class Attrubutes
@@ -141,15 +142,22 @@ class Consumer::Request
     raise "from_xml not defined for #{response_class}" if not defined?(response_class.from_xml)
  
     @request_xml = self.to_xml_etc
-    uri = URI.parse self.url
-    http = Net::HTTP.new uri.host, uri.port
-    if uri.port == 443
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    end
- 
+    
+    http, uri = Helper.http_from_url(self.url)
+    head = defined?(self.headers) ? self.headers : {}
+    head = {"Content-Type" => "text/xml"}.merge(head)
+    
     puts "\n##### Request to #{url}:\n\n#{@request_xml}\n" if $DEBUG
-    @response_xml = http.post(uri.path, @request_xml).body
+    debugger if $POST_DEBUGGER
+    resp = http.post(uri.request_uri, @request_xml, head)
+    
+    if resp.response.code == "302" # moved
+      puts "\n##### Redirected to #{resp['Location']}\n" if $DEBUG
+      http, uri = Helper.http_from_url(resp['Location'])
+      resp = http.post(uri.request_uri, @request_xml, head)
+    end
+    
+    @response_xml = resp.body
     puts "\n##### Response:\n\n#{Helper.tidy(@response_xml)}\n" if $DEBUG
  
     check_request_error(@response_xml)
@@ -247,5 +255,5 @@ private
       self.instance_variable_set("@#{attr}", value)
     end
   end
-
+  
 end

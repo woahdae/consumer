@@ -1,14 +1,16 @@
 = consumer
 
-* FIX (url)
+http://consumer.rubyforge.org
 
 == DESCRIPTION:
 
-FIX (describe your package)
+Consumer is a library for consuming xml resources via Builder, libxml, and some request sending / response marshaling glue. It comes with an app generator that creates an empty ready-for-rails gem that itself comes with a generator for making the request/response classes, config files, and specs (see script/generate after creating a new Consumer project).
 
-== FEATURES/PROBLEMS:
+== FEATURES:
 
-* FIX (list of features or problems)
+A Consumer request class's features include required variable checks, a place for in-class and yaml defaults, a ready to use builder object for creating the xml, and a method for sending the xml to the class's request url that returns Consumer response objects.
+
+Consumer response classes get their features via mixin instead of inheritance (unlike the request classes), so it can return instances of models that already exist in your project. The main feature here is a mapping method that specifies attribute-xpath pairs to map object attributes to an xml response. Multiple mappings can exist for a class, so it can be created from a variety of xml sources. It can return a single response object or an array of response objects, and can set attributes of a response object to other response objects (i.e. it can handle associations).
 
 == SYNOPSIS:
 
@@ -16,11 +18,14 @@ FIX (describe your package)
 
 == REQUIREMENTS:
 
-* FIX (list of requirements)
+libxml-ruby
+builder
+activesupport
 
 == INSTALL:
 
-* FIX (sudo gem install, anything else)
+* if you haven't already, <code>gem sources -a http://gems.github.com</code>
+* <code>sudo gem install woahdae-consumer</code>
 
 == LICENSE:
 

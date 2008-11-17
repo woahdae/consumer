@@ -16,7 +16,7 @@ class RequestGenerator < RubiGen::Base
     @request_file = @request_class.underscore
     @response_file = @response_class.underscore
     @response_xml = @request_base.underscore + "_response.xml"
-    @appname = APP_ROOT.split(/[\/\\]/).last
+    @appname = APP_ROOT.split("/").last
     extract_options
   end
 
@@ -28,6 +28,14 @@ class RequestGenerator < RubiGen::Base
       m.directory "lib/#{@appname}"
       m.directory 'spec'
       m.directory 'spec/xml'
+      
+      # 1 level of namespace support
+      if @request_file.include?("/")
+        namespace = @request_file.split("/")[0]
+        m.directory "lib/#{@appname}/#{namespace}"
+        m.directory "spec/#{namespace}"
+        m.directory "spec/xml/#{namespace}"
+      end
       
       templates = [
         ["lib/request.rb",        "lib/#{@appname}/#{@request_file}.rb"],

@@ -98,4 +98,14 @@ module Consumer::Helper
     return hash
   end
   
+  def self.http_from_url(url)
+    uri = URI.parse url
+    http = Net::HTTP.new uri.host, uri.port
+    if uri.port == 443
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    end
+    return http, uri
+  end
+  
 end

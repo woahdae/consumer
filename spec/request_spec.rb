@@ -51,7 +51,7 @@ describe Consumer::Request do
     
       http.should_receive(:post).
         with("/api", request_xml).
-        and_return(mock("response", :body => response_xml))
+        and_return(mock("response", :body => response_xml, :response => mock("aoeu", :code => "200")))
       object = request.do
       object.hello.should == "Woody"
     end
