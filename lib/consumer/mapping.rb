@@ -1,3 +1,4 @@
+require 'ruby-debug'
 module Consumer::Mapping
   def self.included(base)
     base.extend ClassMethods
@@ -87,8 +88,8 @@ module Consumer::Mapping
     #   return an array of objects.
     # * Calls from_xml on elements in map[:associations] (see
     #   association_from_xml)
-    # * Calls map[:block] with the new instance just before adding it to the 
-    #   return array for custom post-processing
+    # * Calls map[:block] with the new instance (and optionally the libxml node)
+    #   just before adding it to the return array for custom post-processing
     # === Returns
     # * An array of instances or a new instance depending on whether map[:all]
     #   is true or false, respectively
@@ -106,7 +107,15 @@ module Consumer::Mapping
           instance.association_from_xml(xml, association)
         end
         
-        map[:block].call(instance) if map[:block]
+        b = map[:block]
+        if b
+          case b.arity # number of parameters
+          when 1
+            b.call(instance)
+          when 2
+            b.call(instance, node)
+          end
+        end
         
         return instance unless map[:all]
         instances << instance

@@ -145,7 +145,6 @@ class Consumer::Request
     
     http, uri = Helper.http_from_url(self.url)
     head = defined?(self.headers) ? self.headers : {}
-    head = {"Content-Type" => "text/xml"}.merge(head)
     
     puts "\n##### Request to #{url}:\n\n#{@request_xml}\n" if $DEBUG
     debugger if $POST_DEBUGGER
