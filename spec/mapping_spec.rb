@@ -56,6 +56,18 @@ describe Consumer::Mapping do
     }.should raise_error
   end
   
+  it "calls map blocks" do
+    MockObject.map(:first, "//empty", {}) {|instance| instance.price = "5"}
+    object = MockObject.from_xml_via_map("<empty></empty>")
+    object.price.should == "5"
+  end
+
+  it "calls map blocks with node also" do
+    MockObject.map(:first, "//empty", {}) {|instance, node| instance.price = node.find_first("//empty").content}
+    object = MockObject.from_xml_via_map("<empty>5</empty>")
+    object.price.should == "5"
+  end
+  
   describe "association_from_xml" do
     it "creates an association from xml" do
       object = MockObject.new
