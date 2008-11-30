@@ -165,6 +165,10 @@ class Consumer::Request
     return response_class.from_xml(@response_xml)
   end
   
+  def self.do(args = {})
+    self.new(args).do
+  end
+  
   # Gets called during do instead of just to_xml, and does a bit more than
   # just return xml.
   # 

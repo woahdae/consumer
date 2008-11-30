@@ -118,7 +118,9 @@ module Consumer::Mapping
     # you can override this to what you want. Defaults to
     # an alias for from_xml_via_map.
     def from_xml(xml)
-      from_xml_via_map(xml)
+      @xml = xml
+      self.before_from_xml if defined?(before_from_xml)
+      from_xml_via_map(@xml)
     end
     
     # initializes a new instance of self and uses the attribute setters to 
