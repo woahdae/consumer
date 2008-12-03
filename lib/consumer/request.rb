@@ -141,6 +141,7 @@ class Consumer::Request
   # an object or array of objects (an array of objects if response_class is
   # using Consumer::Mapping)
   def do
+    return if defined?(self.abort?) && self.abort?
     raise "to_xml not defined for #{self.class}" if not defined?(self.to_xml)
     raise "url not defined for #{self.class}" if not self.url
     raise "from_xml not defined for #{response_class}" if not defined?(response_class.from_xml)
