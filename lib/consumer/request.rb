@@ -114,14 +114,18 @@ class Consumer::Request
     # it's really handy to have all the other attrs init'd when we call
     # self.defaults 'cuz we can use them to help define conditional defaults.
     yaml = Helper.hash_from_yaml(*yaml_defaults)
+    yaml, attrs = symbolize_keys(yaml, attrs)
+
     initialize_attrs(yaml.merge(attrs)) # load yaml, but attrs will overwrite dups
-    
+
     # now self.defaults has access to above stuff
     class_defaults = self.defaults
-    
+    class_defaults = symbolize_keys(class_defaults).first
+
     # but we wanted defaults loaded first.
     all_defaults = class_defaults.merge(yaml)
-    initialize_attrs(all_defaults.merge(attrs))
+    final_attrs = all_defaults.merge(attrs)
+    initialize_attrs(final_attrs)
   end
  
   # Sends self.to_xml to self.url and returns new object(s) created via
@@ -259,4 +263,9 @@ private
     end
   end
   
+  def symbolize_keys(*hashes)
+    hashes.each do |hash|
+      hash.each {|k,v| hash[k.to_sym] = v;hash.delete(k.to_s)}
+    end
+  end
 end
