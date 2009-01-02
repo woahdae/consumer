@@ -82,7 +82,8 @@ module Consumer::Helper
   # everywhere.
   def self.hash_from_yaml(file, namespace = nil)
     begin
-      hash = file ? YAML.load(File.read("config/" + file)) : {}
+      file = "config/" + file if !File.exists?(file)
+      hash = file ? YAML.load(File.read(file)) : {}
     rescue => e
       raise ArgumentError, "YAML load error: #{e.message}"
     end

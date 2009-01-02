@@ -1,4 +1,3 @@
-require 'ruby-debug'
 module Consumer::Mapping
   def self.included(base)
     base.extend ClassMethods
