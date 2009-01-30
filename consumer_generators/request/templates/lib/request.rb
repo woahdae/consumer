@@ -1,6 +1,6 @@
 # === Vendor API Docs
 # http://www.example.com/handy_docs
-class <%= request_class %> < Consumer::Request
+class <%= "#{appname.camelcase}::#{request_class}" %> < Consumer::Request
   
   ### Note: Everything except to_xml is optional (though handy) ###
   
@@ -32,6 +32,10 @@ class <%= request_class %> < Consumer::Request
     return "www.example.com/testing" if $TESTING
     
     "www.example.com"
+  end
+
+  def headers
+    {"SoapAction" => ""}
   end
   
   # Called before required vars are checked, too

@@ -3,16 +3,24 @@ $:.unshift(File.dirname(__FILE__)) unless
 
 require 'libxml'
 require 'builder'
-require 'active_support/core_ext/string/inflections'
 
+# I just want singularize and constantize from ActiveSupport,
+# but I don't need the rest of AS
+module ActiveSupport
+  module CoreExtensions
+    module String
+      module Inflections
+      end
+    end
+  end
+end
+require 'active_support/core_ext/string/inflections'
 class String
-  # I just want singularize and constantize from ActiveSupport,
-  # but I don't need the rest of AS
   include ActiveSupport::CoreExtensions::String::Inflections
 end
 
 module Consumer
-  VERSION = '0.8.0'
+  VERSION = '0.8.1'
 end
 
 require 'consumer/mapping'

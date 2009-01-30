@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + "/spec_helper"
 
-describe <%= request_class %> do
+describe <%= "#{appname.camelcase}::#{request_class}" %> do
 
   it "creates xml" do
     <%= request_class.underscore %> = <%= request_class %>.new({

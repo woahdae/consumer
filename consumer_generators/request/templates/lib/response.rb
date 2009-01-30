@@ -1,4 +1,4 @@
-class <%= response_class %>
+class <%= "#{appname.camelcase}::#{response_class}" %>
   include Consumer::Mapping
   attr_accessor :attribute
   

@@ -80,10 +80,9 @@ module Consumer::Helper
   # 
   # You don't have to use the global namespace, but if you do, it will be included
   # everywhere.
-  def self.hash_from_yaml(file, namespace = nil)
+  def self.hash_from_yaml(base_path, file, namespace = nil)
     begin
-      file = "config/" + file if !File.exists?(file)
-      hash = file ? YAML.load(File.read(file)) : {}
+      hash = (base_path && file) ? YAML.load(File.read(File.join(base_path, file))) : {}
     rescue => e
       raise ArgumentError, "YAML load error: #{e.message}"
     end

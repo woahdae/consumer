@@ -17,8 +17,6 @@ app_generators/consumer/templates/rails/init.rb
 app_generators/consumer/templates/script/destroy
 app_generators/consumer/templates/script/generate
 app_generators/consumer/templates/spec/spec_helper.rb
-app_generators/consumer/templates/spec/ups_rate_request_spec.rb
-app_generators/consumer/templates/spec/xml/ups_rate_response.xml
 bin/consumer
 config/website.yml.sample
 consumer.gemspec
