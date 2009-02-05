@@ -1,1 +1,1 @@
-require 'lib/<%= name %>'
+require '<%= name %>'

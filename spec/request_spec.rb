@@ -50,7 +50,7 @@ describe Consumer::Request do
       Net::HTTP.stub!(:new).and_return(http)
     
       http.should_receive(:post).
-        with("/api", request_xml, {"Content-Type"=>"text/xml"}).
+        with("/api", request_xml, {}).
         and_return(mock("response", :body => response_xml, :response => mock("aoeu", :code => "200")))
       object = request.do
       object.hello.should == "Woody"

@@ -1,4 +1,5 @@
 History.txt
+LICENSE
 Manifest.txt
 PostInstall.txt
 README.rdoc
@@ -16,8 +17,6 @@ app_generators/consumer/templates/rails/init.rb
 app_generators/consumer/templates/script/destroy
 app_generators/consumer/templates/script/generate
 app_generators/consumer/templates/spec/spec_helper.rb
-app_generators/consumer/templates/spec/ups_rate_request_spec.rb
-app_generators/consumer/templates/spec/xml/ups_rate_response.xml
 bin/consumer
 config/website.yml.sample
 consumer.gemspec
@@ -49,6 +48,8 @@ lib/consumer.rb
 lib/consumer/helper.rb
 lib/consumer/mapping.rb
 lib/consumer/request.rb
+rails_generators/request/USAGE
+rails_generators/request/request_generator.rb
 script/console
 script/destroy
 script/generate
@@ -62,8 +63,9 @@ spec/xml/rate_response.xml
 spec/xml/rate_response_error.xml
 tasks/rspec.rake
 test/test_consumer_generator.rb
+test/test_consumer_plugin_request_generator.rb
 test/test_generator_helper.rb
-test/test_request_generator.rb
+test/test_rails_request_generator.rb
 website/index.html
 website/index.txt
 website/javascripts/rounded_corners_lite.inc.js

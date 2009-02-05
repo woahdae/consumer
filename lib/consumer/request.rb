@@ -1,7 +1,6 @@
 require 'net/http'
 require 'net/https'
 require 'yaml'
-require 'ruby-debug'
 
 ##
 # === Class Attrubutes
@@ -113,7 +112,8 @@ class Consumer::Request
   def initialize(attrs = {})
     # it's really handy to have all the other attrs init'd when we call
     # self.defaults 'cuz we can use them to help define conditional defaults.
-    yaml = Helper.hash_from_yaml(*yaml_defaults)
+    root = self.config_root
+    yaml = Helper.hash_from_yaml(root, *yaml_defaults)
     yaml, attrs = symbolize_keys(yaml, attrs)
 
     initialize_attrs(yaml.merge(attrs)) # load yaml, but attrs will overwrite dups
@@ -217,6 +217,14 @@ class Consumer::Request
  
   def defaults
     self.class.defaults
+  end
+  
+  def config_root
+    if defined?(RAILS_ROOT)
+      RAILS_ROOT + "/config"
+    else
+      "config"
+    end
   end
 
 protected
