@@ -20,7 +20,7 @@ module Consumer::Mapping
   # === Returns
   # Nothing in particular
   def association_from_xml(xml, association, klass = nil)
-    klass ||= association.to_s.capitalize.singularize.constantize 
+    klass ||= association.to_s.capitalize.singularize.camelcase.constantize 
 
     association_instance = klass.from_xml(xml)
     return if association_instance.nil?
@@ -104,7 +104,7 @@ module Consumer::Mapping
         
         map[:associations].each do |association|
           # TODO: spec
-          instance.association_from_xml(xml, association)
+          instance.association_from_xml(node.to_s, association)
         end
         
         b = map[:block]
