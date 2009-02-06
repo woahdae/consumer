@@ -1,10 +1,12 @@
+# -*- encoding: utf-8 -*-
+
 Gem::Specification.new do |s|
   s.name = %q{consumer}
   s.version = "0.8.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Woody Peterson"]
-  s.date = %q{2009-01-29}
+  s.date = %q{2009-02-05}
   s.default_executable = %q{consumer}
   s.description = %q{Consumer is a library for consuming xml resources via Builder, libxml, and some request sending / response marshaling glue. It comes with an app generator that creates an empty ready-for-rails gem that itself comes with a generator for making the request/response classes, config files, and specs (see script/generate after creating a new Consumer project).}
   s.email = ["woody.peterson@gmail.com"]
@@ -17,32 +19,32 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--main", "README.rdoc"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{consumer}
-  s.rubygems_version = %q{1.2.0}
+  s.rubygems_version = %q{1.3.1}
   s.summary = %q{Consumer is a library for consuming xml resources via Builder, libxml, and some request sending / response marshaling glue}
-  s.test_files = ["test/test_consumer_generator.rb", "test/test_consumer_plugin_request_generator.rb", "test/test_generator_helper.rb", "test/test_rails_request_generator.rb"]
+  s.test_files = ["test/test_consumer_generator.rb", "test/test_generator_helper.rb"]
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 2
 
-    if current_version >= 3 then
+    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<activesupport>, [">= 2.0.2"])
       s.add_runtime_dependency(%q<libxml-ruby>, [">= 0.8.3"])
       s.add_runtime_dependency(%q<builder>, [">= 2.1.2"])
-      s.add_development_dependency(%q<newgem>, [">= 1.0.7"])
+      s.add_development_dependency(%q<newgem>, [">= 1.1.0"])
       s.add_development_dependency(%q<hoe>, [">= 1.8.0"])
     else
       s.add_dependency(%q<activesupport>, [">= 2.0.2"])
       s.add_dependency(%q<libxml-ruby>, [">= 0.8.3"])
       s.add_dependency(%q<builder>, [">= 2.1.2"])
-      s.add_dependency(%q<newgem>, [">= 1.0.7"])
+      s.add_dependency(%q<newgem>, [">= 1.1.0"])
       s.add_dependency(%q<hoe>, [">= 1.8.0"])
     end
   else
     s.add_dependency(%q<activesupport>, [">= 2.0.2"])
     s.add_dependency(%q<libxml-ruby>, [">= 0.8.3"])
     s.add_dependency(%q<builder>, [">= 2.1.2"])
-    s.add_dependency(%q<newgem>, [">= 1.0.7"])
+    s.add_dependency(%q<newgem>, [">= 1.1.0"])
     s.add_dependency(%q<hoe>, [">= 1.8.0"])
   end
 end
