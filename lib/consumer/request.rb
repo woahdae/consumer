@@ -1,6 +1,7 @@
 require 'net/http'
 require 'net/https'
 require 'yaml'
+require 'ruby-debug'
 
 ##
 # === Class Attrubutes
@@ -69,6 +70,20 @@ class Consumer::Request
   include Consumer
  
   class << self
+		def basic_authentication(*args)
+			@request_user, @request_pass = args if !args.empty?
+		end
+		
+		def request_user(user = nil)
+			@request_user = user if user
+			@request_user
+		end
+
+		def request_pass(pass = nil)
+			@request_pass = pass if pass
+			@request_pass
+		end
+
     def url(url = nil)
       @url = url if url
       @url
@@ -112,8 +127,7 @@ class Consumer::Request
   def initialize(attrs = {})
     # it's really handy to have all the other attrs init'd when we call
     # self.defaults 'cuz we can use them to help define conditional defaults.
-    root = self.config_root
-    yaml = Helper.hash_from_yaml(root, *yaml_defaults)
+    yaml = Helper.hash_from_yaml(*yaml_defaults)
     yaml, attrs = symbolize_keys(yaml, attrs)
 
     initialize_attrs(yaml.merge(attrs)) # load yaml, but attrs will overwrite dups
@@ -148,18 +162,18 @@ class Consumer::Request
  
     @request_xml = self.to_xml_etc
     
-    http, uri = Helper.http_from_url(self.url)
     head = defined?(self.headers) ? self.headers : {}
-    
-    puts "\n##### Request to #{url}:\n\n#{@request_xml}\n" if $DEBUG
-    debugger if $POST_DEBUGGER
-    resp = http.post(uri.request_uri, @request_xml, head)
-    
-    if resp.response.code == "302" # moved
-      puts "\n##### Redirected to #{resp['Location']}\n" if $DEBUG
-      http, uri = Helper.http_from_url(resp['Location'])
-      resp = http.post(uri.request_uri, @request_xml, head)
-    end
+
+		resp = nil
+		
+		uri = URI.parse self.url
+
+		Net::HTTP.start(uri.host,uri.port) {|http|
+			req = Net::HTTP::Get.new(uri.request_uri)
+			req.basic_auth request_user, request_pass if request_user and request_pass
+			req.body = @request_xml
+			resp = http.request(req)
+		}
     
     @response_xml = resp.body
     puts "\n##### Response:\n\n#{Helper.tidy(@response_xml)}\n" if $DEBUG
@@ -168,7 +182,7 @@ class Consumer::Request
  
     return response_class.from_xml(@response_xml)
   end
-  
+
   def self.do(args = {})
     self.new(args).do
   end
@@ -198,6 +212,14 @@ class Consumer::Request
     raise "Invalid response_class; see docs for naming conventions etc" if !ret
     return Object.const_get(ret)
   end
+
+	def request_user
+		self.class.request_user
+	end
+
+	def request_pass
+		self.class.request_pass
+	end
  
   def error_paths
     self.class.error_paths
@@ -217,14 +239,6 @@ class Consumer::Request
  
   def defaults
     self.class.defaults
-  end
-  
-  def config_root
-    if defined?(RAILS_ROOT)
-      RAILS_ROOT + "/config"
-    else
-      "config"
-    end
   end
 
 protected
