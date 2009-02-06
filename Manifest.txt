@@ -6,6 +6,7 @@ README.rdoc
 Rakefile
 app_generators/consumer/USAGE
 app_generators/consumer/consumer_generator.rb
+app_generators/consumer/templates/.gitignore
 app_generators/consumer/templates/LICENSE
 app_generators/consumer/templates/README.rdoc
 app_generators/consumer/templates/Rakefile
@@ -38,6 +39,7 @@ examples/active_record/xml/book.xml
 examples/active_record/xml/book_with_contributors.xml
 examples/active_record/xml/contributor.xml
 examples/active_record/xml/contributor_with_books.xml
+examples/shipping/.gitignore
 examples/shipping/environment.rb
 examples/shipping/rate.rb
 examples/shipping/shipping.yml.sample
@@ -48,8 +50,6 @@ lib/consumer.rb
 lib/consumer/helper.rb
 lib/consumer/mapping.rb
 lib/consumer/request.rb
-rails_generators/request/USAGE
-rails_generators/request/request_generator.rb
 script/console
 script/destroy
 script/generate
@@ -63,9 +63,7 @@ spec/xml/rate_response.xml
 spec/xml/rate_response_error.xml
 tasks/rspec.rake
 test/test_consumer_generator.rb
-test/test_consumer_plugin_request_generator.rb
 test/test_generator_helper.rb
-test/test_rails_request_generator.rb
 website/index.html
 website/index.txt
 website/javascripts/rounded_corners_lite.inc.js

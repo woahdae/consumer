@@ -1,7 +1,7 @@
 require 'spec'
 require 'environment'
 
-# Very broad tests to see ROXML working with Active Record
+# Very broad tests to see Consumer working with Active Record
 
 describe "ROXML in ActiveRecord" do
   before(:all) do
