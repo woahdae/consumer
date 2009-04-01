@@ -70,19 +70,19 @@ class Consumer::Request
   include Consumer
  
   class << self
-		def basic_authentication(*args)
-			@request_user, @request_pass = args if !args.empty?
-		end
-		
-		def request_user(user = nil)
-			@request_user = user if user
-			@request_user
-		end
+    def basic_authentication(*args)
+      @request_user, @request_pass = args if !args.empty?
+    end
+    
+    def request_user(user = nil)
+      @request_user = user if user
+      @request_user
+    end
 
-		def request_pass(pass = nil)
-			@request_pass = pass if pass
-			@request_pass
-		end
+    def request_pass(pass = nil)
+      @request_pass = pass if pass
+      @request_pass
+    end
 
     def url(url = nil)
       @url = url if url
@@ -155,7 +155,7 @@ class Consumer::Request
   # Whatever response_class.from_xml(@response_xml) returns, which should be
   # an object or array of objects (an array of objects if response_class is
   # using Consumer::Mapping)
-  def do
+  def send!
     return if defined?(self.abort?) && self.abort?
     raise "to_xml not defined for #{self.class}" if not defined?(self.to_xml)
     raise "url not defined for #{self.class}" if not self.url
@@ -163,30 +163,38 @@ class Consumer::Request
  
     @request_xml = self.to_xml_etc
     
-    head = defined?(self.headers) ? self.headers : {}
+    resp = send_request(self.url)
 
-		resp = nil
-		
-		uri = URI.parse self.url
-
-		Net::HTTP.start(uri.host,uri.port) {|http|
-			req = Net::HTTP::Get.new(uri.request_uri)
-			req.basic_auth request_user, request_pass if request_user and request_pass
-			req.body = @request_xml
-			resp = http.request(req)
-		}
-    
-    @response_xml = resp.body
-    puts "\n##### Response:\n\n#{Helper.tidy(@response_xml)}\n" if $DEBUG
+    check_request_error(resp)
  
-    check_request_error(@response_xml)
- 
-    return response_class.from_xml(@response_xml)
+    return response_class.from_xml(resp)
   end
+  alias :do :send!
 
-  def self.do(args = {})
+  def send_request(url)
+    heads = defined?(self.headers) ? self.headers : {}
+    
+    uri = URI.parse url
+    http = Net::HTTP.new uri.host, uri.port
+    req = Net::HTTP::Post.new(uri.request_uri, heads)
+    if uri.port == 443
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    end
+    req.basic_auth @request_user, @request_pass if @request_user && @request_pass
+    req.body = @request_xml
+    puts "\n##### Request to #{url}:\n\n#{@request_xml}\n" if $DEBUG
+    debugger if $CONSUMER_POST_DEBUGGER
+    response = http.request(req)
+    @response_xml = response.body
+    puts "\n##### Response:\n\n#{Helper.tidy(@response_xml)}\n" if $DEBUG
+    return @response_xml
+  end
+  
+  def self.send!(args = {})
     self.new(args).do
   end
+  def self.do(args = {});send!(args);end
   
   # Gets called during do instead of just to_xml, and does a bit more than
   # just return xml.
@@ -214,13 +222,13 @@ class Consumer::Request
     return Object.const_get(ret)
   end
 
-	def request_user
-		self.class.request_user
-	end
+  def request_user
+    self.class.request_user
+  end
 
-	def request_pass
-		self.class.request_pass
-	end
+  def request_pass
+    self.class.request_pass
+  end
  
   def error_paths
     self.class.error_paths

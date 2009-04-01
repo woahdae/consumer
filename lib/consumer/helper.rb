@@ -47,8 +47,9 @@ module Consumer::Helper
   # whitespace characters (space, newline, tab, and return) are considered empty.
   def self.compact_xml(xml)
     old_xml = xml
+    old_xml = old_xml.gsub(/\<[A-Za-z: ]*?\/\>[\t\r\n]*/,"")
     loop do
-      new_xml = old_xml.gsub(/\<(\w*?)\>[ \t\r\n]*\<\/\1\>\n?/, "")
+      new_xml = old_xml.gsub(/\<(.*?)\>[ \t\r\n]*\<\/\1\>[\t\r\n]*/, "")
       if old_xml == new_xml # nothing was changed
         return new_xml
       else # something changed, so we'll go through it again

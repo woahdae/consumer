@@ -46,11 +46,10 @@ describe Consumer::Request do
         <Hello>Woody</Hello>
       </SillyXml>
       EOF
-      http = mock("aaa", :use_ssl= => "", :verify_mode= => "")
+      http = mock("Http", :use_ssl= => "", :verify_mode= => "")
       Net::HTTP.stub!(:new).and_return(http)
     
-      http.should_receive(:post).
-        with("/api", request_xml, {}).
+      http.should_receive(:request).
         and_return(mock("response", :body => response_xml, :response => mock("aoeu", :code => "200")))
       object = request.do
       object.hello.should == "Woody"

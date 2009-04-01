@@ -79,11 +79,26 @@ EOS
       @clean = ""
     end
     
-    it "remove empty nodes containing whitespace characters" do
+    it "removes empty nodes containing whitespace characters" do
       @dirty = "<hello>  \r \t\n</hello>"
       @clean = ""
     end
     
+    it "works with namespaces" do
+      @dirty = "<ns:hello>\n</ns:hello>"
+      @clean = ""
+    end
+    
+    it "should not clean nodes with attributes" do
+      @dirty = "<hello attr='blah'>\n</hello>"
+      @clean = "<hello attr='blah'>\n</hello>"
+    end
+    
+    it "works with empty nodes of the form <node />" do
+      @dirty = "<hello />"
+      @clean = ""
+    end
+
     after(:each) do
       Consumer::Helper.compact_xml(@dirty).should == @clean
     end

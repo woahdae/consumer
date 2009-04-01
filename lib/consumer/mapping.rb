@@ -54,13 +54,12 @@ module Consumer::Mapping
     # [+block+]        In from_xml_via_map this gets called with the new 
     #                  instance as the last step of instantiation.
     # === Returns
-    # The newly created map
+    # The newly created map, or existing map if the base path already exists
     # === Raises
-    # * RuntimeError if the base path is already defined in another mapping
-    #   in the class
+    # Nothing
     def map(first_or_all, base_path, registry, options = {}, &block)
-      if self.maps.find {|m| m[:base_path] == base_path}
-        raise "Base path exists: #{base_path}" 
+      if map = self.maps.find {|m| m[:base_path] == base_path}
+        return map
       end
       
       map = {
